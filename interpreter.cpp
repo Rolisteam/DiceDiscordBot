@@ -17,7 +17,7 @@
  */
 
 #include "interpreter.hpp"
-#include "commands/all.hpp"
+//#include "commands/all.hpp"
 
 Interpreter::Interpreter(QDiscord& discord, QString prefix, QObject* parent)
 :QObject(parent), _discord(discord)
