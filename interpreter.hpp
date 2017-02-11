@@ -25,6 +25,7 @@
 #include "commandmanager.hpp"
 #include "config.hpp"
 #include "utils.hpp"
+#include "diceparser.h"
 
 class Interpreter : public QObject
 {
@@ -33,12 +34,18 @@ public:
 	explicit Interpreter(QDiscord& discord,
                          QString prefix = "!",
 						 QObject* parent = 0);
-private:
+
+private://functions
 	void messageReceived(QDiscordMessage message);
 	void registerCommands();
+    QString diceToText(ExportedDiceResult &dice, bool highlight, bool homogeneous);
+    QString startDiceParsing(QString cmd);
+
+private://members
 	QDiscord& _discord;
 	Config _config;
 	QString _prefix;
+    DiceParser m_diceParser;
 };
 
 #endif // INTERPRETER_HPP
