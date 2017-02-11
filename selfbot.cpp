@@ -18,7 +18,7 @@
 
 #include "selfbot.hpp"
 
-//https://discordapp.com/oauth2/authorize?&client_id=279722369260453888&scope=bot&permissions=0
+//
 
 SelfBot::SelfBot(QObject* parent)
 :QObject(parent), _discord(),_interpreter(_discord)
