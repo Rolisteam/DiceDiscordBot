@@ -14,6 +14,7 @@ You need to send command with ! as the first character.
 Examples:
 
 > !2d6
+
 > !2d[-1-1]
 
 (More details see documentation)
