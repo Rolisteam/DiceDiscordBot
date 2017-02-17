@@ -18,6 +18,7 @@
 
 #include "interpreter.hpp"
 //#include "commands/all.hpp"
+#include <QtDebug>
 
 Interpreter::Interpreter(QDiscord& discord, QString prefix, QObject* parent)
 :QObject(parent), _discord(discord)
@@ -31,12 +32,14 @@ Interpreter::Interpreter(QDiscord& discord, QString prefix, QObject* parent)
 	QJsonObject configObject = _config.object();
 	if(!configObject.contains("interpreter"))
 	{
+        qInfo() << "No config for Interpreter";
         configObject["interpreter"] = QJsonObject({{"prefix", "!"}});
 		_config.setObject(configObject);
 	}
 	_prefix = configObject["interpreter"].toObject()["prefix"].toString(prefix);
 	registerCommands();
 }
+#include <qdiscord.d/qdiscordchannel.hpp>
 
 void Interpreter::messageReceived(QDiscordMessage message)
 {
@@ -47,11 +50,9 @@ void Interpreter::messageReceived(QDiscordMessage message)
         return;
     }
 
-    // remove prefix
     content = content.remove(0,1);
-
     QString result = startDiceParsing(content);
-
+    qInfo() << "Result:"<< result << message.channel()->name();
     _discord.rest()->sendMessage(result,message.channelId(),false);
 }
 
@@ -157,13 +158,16 @@ QString Interpreter::diceToText(ExportedDiceResult& dice,bool highlight,bool hom
 
 QString Interpreter::startDiceParsing(QString cmd)
 {
+    qInfo() << "Start dice Command" << cmd;
     QString result("");
     bool highlight = true;
     if(m_diceParser.parseLine(cmd))
     {
+            qInfo() << cmd << "is valid";
             m_diceParser.Start();
             if(!m_diceParser.getErrorMap().isEmpty())
             {
+                qInfo() << cmd << "leads to error";
                 result +=  "```markdown\n# Error:\n" + m_diceParser.humanReadableError() + "\n```";
             }
             else
@@ -192,7 +196,6 @@ QString Interpreter::startDiceParsing(QString cmd)
                 {
                     str = QString("```markdown\n#%1, details:[%3 (%2)]\n```").arg(scalarText).arg(diceText).arg(m_diceParser.getDiceCommand());
                 }
-
                 if(m_diceParser.hasStringResult())
                 {
                     str = m_diceParser.getStringResult();
@@ -202,6 +205,7 @@ QString Interpreter::startDiceParsing(QString cmd)
     }
     else
     {
+        qInfo() << cmd << "is not valid";
         result += "markdown\n#Error:" + m_diceParser.humanReadableError() + "\n```";
     }
 

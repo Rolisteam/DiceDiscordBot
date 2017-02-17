@@ -19,9 +19,42 @@
 #include <QCoreApplication>
 #include "selfbot.hpp"
 
+
+
+int g_logMini = QtDebugMsg;
+
+void outputDisplay(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+      QByteArray localMsg = msg.toLocal8Bit();
+      if(g_logMini>type)
+      {
+          return;
+      }
+      switch (type)
+      {
+      case QtDebugMsg:
+          fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+          break;
+      case QtInfoMsg:
+          fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+          break;
+      case QtWarningMsg:
+          fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+          break;
+      case QtCriticalMsg:
+          fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+          break;
+      case QtFatalMsg:
+          fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+          abort();
+      }
+}
+
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(outputDisplay);
 	QCoreApplication a(argc, argv);
+    g_logMini = QtInfoMsg;
 	SelfBot b; //SelfBot's constructor will take over from here.
 	Q_UNUSED(b); //Suppress the warning about b being unused.
 	return a.exec();
